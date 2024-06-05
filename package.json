@@ -6,9 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@libsql/client": "^0.6.2",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.31.1",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
@@ -19,6 +24,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vercel/style-guide": "^6.0.0",
+    "drizzle-kit": "^0.22.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
