@@ -4,6 +4,7 @@ import ReactSelect from 'react-select'
 import makeAnimated from 'react-select/animated'
 import { sources } from './sources'
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 export function Example() {
   const animatedComponents = makeAnimated()
@@ -11,10 +12,25 @@ export function Example() {
     { name: string; value: number }[]
   >([
     {
-      name: 'BBC News',
+      name: sources[0].label,
       value: 5,
     },
   ])
+  const [buttonClicked, setButtonClicked] = useState(false)
+  const { data, isPending, error } = useQuery({
+    queryKey: ['summarise-example'],
+    queryFn: async () => {
+      const response = await fetch('/api/example', {
+        method: 'POST',
+        body: JSON.stringify({
+          sources: priorities,
+        }),
+      })
+      if (!response.ok) throw new Error(response.statusText)
+      return response.json() as Promise<{ __html: string }>
+    },
+    enabled: buttonClicked,
+  })
 
   return (
     <div className="card shrink-0 w-full max-w-md shadow-2xl bg-base-100">
@@ -94,11 +110,17 @@ export function Example() {
           </div>
         </div>
         <div className="form-control mt-6">
-          <button className="btn btn-primary text-white font-bold">
+          <button
+            onClick={() => setButtonClicked(true)}
+            className="btn btn-primary text-white font-bold"
+          >
             Summarise!
           </button>
         </div>
       </div>
+      {data && !isPending && (
+        <div dangerouslySetInnerHTML={{ __html: data.__html }} />
+      )}
     </div>
   )
 }
