@@ -7,7 +7,7 @@ export function SignIn() {
         'use server'
         await signIn('resend', formData)
       }}
-      className="flex flex-col md:flex-row gap-4 items-center justify-center bg-gray-100 bg-opacity-10 p-4 rounded-lg border border-gray-700 shadow-md"
+      className="max-w-md flex flex-col md:flex-row gap-4 items-center justify-center bg-gray-100 bg-opacity-10 p-4 rounded-lg border border-gray-700 shadow-md"
     >
       <input
         type="email"

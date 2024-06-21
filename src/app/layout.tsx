@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './globals.css'
 import { Providers } from './providers'
+import { NavBar } from '@/components/navBar/nav-bar'
 
 export const metadata: Metadata = {
   title: 'Summator',
@@ -16,10 +17,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="sunset"
+      data-theme="light"
     >
       <body>
         <Providers>
+          <NavBar />
           {children}
           <ReactQueryDevtools initialIsOpen={false} />
         </Providers>

@@ -2,13 +2,25 @@ import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core'
 import type { AdapterAccountType } from 'next-auth/adapters'
 
 // Actual schema
-export const alerts = sqliteTable('alerts', {
-  id: text('id').primaryKey(),
-  userId: integer('userId')
+export const summations = sqliteTable('summations', {
+  id: integer('id').primaryKey(),
+  userId: text('userId')
     .notNull()
     .references(() => users.id),
-  fieldStructure: text('fieldStructure').notNull(),
-  template: text('template').notNull(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  triggerTime: integer('triggerTime', { mode: 'timestamp' }).notNull(),
+  lastTriggered: integer('lastTriggered', { mode: 'timestamp' }),
+})
+
+export const sources = sqliteTable('sources', {
+  id: integer('id').primaryKey(),
+  summationId: integer('summationId')
+    .notNull()
+    .references(() => summations.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  url: text('url').notNull(),
+  importance: integer('importance').notNull(),
 })
 
 // Authentication & user accounts
