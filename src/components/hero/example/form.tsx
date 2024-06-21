@@ -100,9 +100,11 @@ export function ExampleForm({ onSubmit, isPending }: ExampleFormProps) {
       </div>
       <div className="form-control mt-6">
         <button
-          onClick={() => onSubmit(priorities)}
+          onClick={() => {
+            if (isPending) return
+            onSubmit(priorities)
+          }}
           className="btn btn-primary text-white font-bold"
-          disabled={isPending}
         >
           {isPending ? (
             <span className="loading loading-dots loading-lg"></span>
