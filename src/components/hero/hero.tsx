@@ -15,6 +15,9 @@ export function Hero() {
             couple RSS Feeds from sites you're interested in you can enrich your
             daily routine.
           </p>
+          <button className="btn btn-primary text-white text-xl px-12">
+            Make my life easier!
+          </button>
         </div>
         <Example />
       </div>
