@@ -61,8 +61,11 @@ export async function POST(request: Request) {
       max_tokens: 1000,
     })
 
+    console.log(summary)
+
     return new Response(JSON.stringify({ text: summary.content }))
   } catch (error) {
+    console.error(error)
     return new Response(
       error instanceof Error ? error.message : 'An unknown error occured',
       { status: 500 },

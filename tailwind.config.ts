@@ -3,6 +3,26 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  theme: {
+    extend: {
+      keyframes: {
+        bg: {
+          '0%, 100%': {
+            backgroundColor: 'rgba(30, 0, 148, var(--tw-bg-opacity))',
+          },
+          '33%': {
+            backgroundColor: 'rgba(201, 115, 212, var(--tw-bg-opacity))',
+          },
+          '66%': {
+            backgroundColor: 'rgba(89, 201, 110, var(--tw-bg-opacity))',
+          },
+        },
+      },
+      animation: {
+        bg: 'bg 60s infinite',
+      },
+    },
+  },
   plugins: [require('daisyui')],
   daisyui: {
     themes: [

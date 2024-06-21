@@ -104,7 +104,7 @@ export function ExampleForm({ onSubmit, isPending }: ExampleFormProps) {
             if (isPending) return
             onSubmit(priorities)
           }}
-          className="btn btn-primary text-white font-bold"
+          className="btn btn-primary text-white text-xl"
         >
           {isPending ? (
             <span className="loading loading-dots loading-lg"></span>

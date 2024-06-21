@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.hero-gradient {
+  background: radial-gradient(
+      circle at bottom,
+      rgba(255, 255, 255, var(--tw-bg-opacity)),
+      transparent 80%
+    ),
+    linear-gradient(
+      to top,
+      rgba(30, 144, 255, var(--tw-bg-opacity)) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255, 255, 255, var(--tw-bg-opacity)) 70%
+    );
+}
+
