@@ -1,68 +1,79 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 import { sources } from '@/components/hero/example/sources'
-import { XMLParser } from 'fast-xml-parser'
-
-import Anthropic from '@anthropic-ai/sdk'
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+import { db } from '@/db/db'
+import { exampleSummaries } from '@/db/schema'
+import { and, eq, gt } from 'drizzle-orm'
 
 export async function POST(request: Request) {
   try {
+    // Get out the selected sources from the example form
     const selectedSources = (await request.json()) as {
-      sources: [{ name: string; value: number }]
+      sources: [{ name: string; priority: number }]
     }
-    const feeds = sources.filter((source) =>
-      selectedSources.sources.some(
-        (selected) => selected.name === source.label,
-      ),
-    )
 
-    const parser = new XMLParser()
-    const data: {
-      name: string
-      source: string
-      body: string
-    }[] = []
+    // Check if a summary for these settings has already been made in the last 24 hours
+    // Seems like we're doing a lot of work here, but it's still less expensive than
+    // hitting the AI every time. Especially if just the plain default form, with no changes,
+    // is getting spammed.
+    const key = selectedSources.sources
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .reduce((key, source) => {
+        return (key += source.name + source.priority.toString())
+      }, '')
 
-    feeds.map(async (feed) => {
-      const response = await fetch(feed.rss)
-      const xml = await response.text()
-      const lastItems = parser.parse(xml).rss.channel.item.slice(0, 1)
-      lastItems.forEach(async (item: { link: string }) => {
-        const resp = await fetch(item.link)
-        if (!resp.ok) throw new Error('Failed to fetch')
-        const html = await resp.text()
-        const doc = new DOMParser().parseFromString(html, 'text/html')
-        const bodyText = doc.body.textContent
-        data.push({
-          name: feed.label,
-          source: item.link,
-          body: bodyText ?? '',
-        })
-      })
+    const summaries = await db
+      .select({ text: exampleSummaries.text })
+      .from(exampleSummaries)
+      .where(
+        and(
+          eq(exampleSummaries.key, key),
+          gt(exampleSummaries.generated, new Date()),
+        ),
+      )
+
+    if (summaries.length >= 1) {
+      return new Response(
+        JSON.stringify({
+          __html: summaries[0].text,
+        }),
+      )
+    }
+
+    // If we get here, then we need to generate some new text using the AI Summary endpoint
+    // First, we get the feed URL's based on the submitted sources
+    const feeds = selectedSources.sources.map((selectedSource) => {
+      return {
+        rss: sources.find((source) => source.label === selectedSource.name)!
+          .rss,
+        priority: selectedSource.priority,
+      }
     })
 
-    const summary = await anthropic.messages.create({
-      system:
-        'You are summarising news articles for a "Daily Summary" email. Return an HTML email with the summaries of the articles.',
-      messages: [
-        {
-          role: 'user',
-          content: JSON.stringify(data),
-        },
-      ],
-      model: 'claude-3-5-sonnet-20240620',
-      max_tokens: 1000,
+    // Now we pass the sources into the summarise endpoint as if it was a normal summary event
+    const response = await fetch(`${process.env.BASE_API_URL}/api/summarise`, {
+      method: 'POST',
+      body: JSON.stringify({
+        feeds,
+        authKey: process.env.SUMMARY_AUTH_KEY,
+      }),
     })
+    if (!response.ok) throw new Error(response.statusText)
 
-    console.log(summary.content)
+    // We can now return the html/text
+    const content = (await response.json()) as {
+      text: string
+    }
+
+    // But before we do, we need to store it (and it's key) for future use
+    await db.insert(exampleSummaries).values({
+      key,
+      text: content.text,
+      generated: new Date(),
+    })
 
     return new Response(
       JSON.stringify({
-        __html: summary.content,
-        data,
+        __html: content.text,
       }),
     )
   } catch (error) {

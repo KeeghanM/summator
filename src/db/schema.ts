@@ -23,6 +23,13 @@ export const sources = sqliteTable('sources', {
   importance: integer('importance').notNull(),
 })
 
+export const exampleSummaries = sqliteTable('exampleSummaries', {
+  id: integer('id').primaryKey(),
+  text: text('text').notNull(),
+  key: text('key').notNull(),
+  generated: integer('generated', { mode: 'timestamp' }).notNull(),
+})
+
 // Authentication & user accounts
 export const users = sqliteTable('user', {
   id: text('id')
