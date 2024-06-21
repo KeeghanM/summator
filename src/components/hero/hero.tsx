@@ -2,7 +2,7 @@ import { Example } from './example/example'
 
 export function Hero() {
   return (
-    <div className="hero min-h-[70vh] max-h-[70vh] overflow-hidden hero-gradient animate-bg bg-opacity-30">
+    <div className="hero min-h-[70vh] overflow-hidden hero-gradient animate-bg bg-opacity-30">
       <div className="hero-content flex-col lg:flex-row">
         <div className="text-center lg:text-left">
           <h1 className="text-6xl font-bold">

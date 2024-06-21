@@ -10,11 +10,6 @@ export const sources = [
     rss: 'https://www.billboard.com/feed/',
   },
   {
-    label: 'The Verge',
-    value: 'the-verge',
-    rss: 'https://theverge.com/rss/frontpage',
-  },
-  {
     label: 'Entrepreneur',
     value: 'entrepreneur',
     rss: 'https://www.entrepreneur.com/latest.rss',

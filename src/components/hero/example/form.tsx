@@ -13,7 +13,7 @@ export function ExampleForm({ onSubmit, isPending }: ExampleFormProps) {
   const animatedComponents = makeAnimated()
   const [priorities, setPriorities] = useState<Priority[]>([
     {
-      name: sources[0].label,
+      name: sources[2].label,
       priority: 5,
     },
   ])

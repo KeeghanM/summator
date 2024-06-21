@@ -21,23 +21,26 @@ export async function POST(request: Request) {
         return (key += source.name + source.priority.toString())
       }, '')
 
-    const summaries = await db
-      .select({ text: exampleSummaries.text })
-      .from(exampleSummaries)
-      .where(
-        and(
-          eq(exampleSummaries.key, key),
-          gt(exampleSummaries.generated, new Date()),
-        ),
-      )
+    // TODO: BRING THIS BACK - only off for debugging
+    // const now = new Date()
+    // const twentyFourHoursAgo = new Date(now.getTime() - 1000 * 60 * 60 * 24)
+    // const summaries = await db
+    //   .select({ text: exampleSummaries.text })
+    //   .from(exampleSummaries)
+    //   .where(
+    //     and(
+    //       eq(exampleSummaries.key, key),
+    //       gt(exampleSummaries.generated, twentyFourHoursAgo),
+    //     ),
+    //   )
 
-    if (summaries.length >= 1) {
-      return new Response(
-        JSON.stringify({
-          __html: summaries[0].text,
-        }),
-      )
-    }
+    // if (summaries.length >= 1) {
+    //   return new Response(
+    //     JSON.stringify({
+    //       __html: summaries[0].text,
+    //     }),
+    //   )
+    // }
 
     // If we get here, then we need to generate some new text using the AI Summary endpoint
     // First, we get the feed URL's based on the submitted sources
@@ -46,6 +49,7 @@ export async function POST(request: Request) {
         rss: sources.find((source) => source.label === selectedSource.name)!
           .rss,
         priority: selectedSource.priority,
+        name: selectedSource.name,
       }
     })
 
@@ -60,20 +64,18 @@ export async function POST(request: Request) {
     if (!response.ok) throw new Error(response.statusText)
 
     // We can now return the html/text
-    const content = (await response.json()) as {
-      text: string
-    }
+    const data = await response.json()
 
     // But before we do, we need to store it (and it's key) for future use
-    await db.insert(exampleSummaries).values({
-      key,
-      text: content.text,
-      generated: new Date(),
-    })
+    // await db.insert(exampleSummaries).values({
+    //   key,
+    //   text: data.text,
+    //   generated: new Date(),
+    // })
 
     return new Response(
       JSON.stringify({
-        __html: content.text,
+        __html: data.text,
       }),
     )
   } catch (error) {
