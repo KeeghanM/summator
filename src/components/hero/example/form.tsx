@@ -1,22 +1,36 @@
 import { sources } from './sources'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactSelect from 'react-select'
 import makeAnimated from 'react-select/animated'
 
-export type Priority = { name: string; priority: number }
+export type Source = { name: string; priority: number; rss: string }
 
 type ExampleFormProps = {
-  onSubmit: (priorities: Priority[]) => void
+  onSubmit: (priorities: Source[]) => void
   isPending: boolean
 }
 export function ExampleForm({ onSubmit, isPending }: ExampleFormProps) {
   const animatedComponents = makeAnimated()
-  const [priorities, setPriorities] = useState<Priority[]>([
-    {
-      name: sources[2].label,
-      priority: 5,
-    },
+  const [selected, setSelected] = useState<string[]>([sources[0].value])
+  const [priorities, setPriorities] = useState<Source[]>([
+    { name: sources[0].label, priority: 5, rss: sources[0].rss },
   ])
+
+  useEffect(() => {
+    setPriorities(
+      selected.map((s) => {
+        const source = sources.find((source) => source.value === s)
+        if (!source) {
+          throw new Error(`Source ${s} not found`)
+        }
+        return {
+          name: source.label,
+          priority: 5,
+          rss: source.rss,
+        }
+      }),
+    )
+  }, [selected])
 
   return (
     <div>
@@ -27,20 +41,15 @@ export function ExampleForm({ onSubmit, isPending }: ExampleFormProps) {
             <span className="font-bold">Pick your news sources</span>
           </label>
           <ReactSelect
-            isDisabled={isPending}
-            onChange={(selected) => {
-              setPriorities(
-                selected.map((source) => ({
-                  name: source.label,
-                  priority: 5,
-                })),
-              )
+            defaultValue={[sources[0]]}
+            onChange={(values) => {
+              setSelected(values.map((v) => v.value))
             }}
+            isDisabled={isPending}
             components={animatedComponents}
             closeMenuOnSelect={false}
             isMulti={true}
             options={sources}
-            defaultValue={[sources[0]]}
             styles={{
               control: (baseStyles, state) => ({
                 ...baseStyles,
@@ -74,17 +83,7 @@ export function ExampleForm({ onSubmit, isPending }: ExampleFormProps) {
                   step={1}
                   value={priority.priority}
                   onChange={(e) => {
-                    setPriorities(
-                      priorities.map((p, i) => {
-                        if (i === index) {
-                          return {
-                            name: p.name,
-                            priority: parseInt(e.target.value),
-                          }
-                        }
-                        return p
-                      }),
-                    )
+                    console.log(e.target.value)
                   }}
                   className="range"
                 />

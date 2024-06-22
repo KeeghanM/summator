@@ -1,15 +1,14 @@
 'use client'
 
-import ReactSelect from 'react-select'
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { ExampleForm, Priority } from './form'
+import { ExampleForm, Source } from './form'
 
 export function Example() {
   const [htmlString, setHtmlString] = useState<string | undefined>()
 
   const mutation = useMutation({
-    mutationFn: async (priorities: Priority[]) => {
+    mutationFn: async (priorities: Source[]) => {
       const response = await fetch('/api/example', {
         method: 'POST',
         body: JSON.stringify({ sources: priorities }),
